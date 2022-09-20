@@ -39,8 +39,10 @@ import com.punchthrough.blestarterappandroid.ble.isReadable
 import com.punchthrough.blestarterappandroid.ble.isWritableWithoutResponse
 import com.punchthrough.blestarterappandroid.ble.toHexString
 import kotlinx.android.synthetic.main.activity_ble_operations.characteristics_recycler_view
-import kotlinx.android.synthetic.main.activity_ble_operations.log_scroll_view
-import kotlinx.android.synthetic.main.activity_ble_operations.log_text_view
+import kotlinx.android.synthetic.main.activity_ble_operations.humiData
+//import kotlinx.android.synthetic.main.activity_ble_operations.log_scroll_view
+//import kotlinx.android.synthetic.main.activity_ble_operations.log_text_view
+import kotlinx.android.synthetic.main.activity_ble_operations.tempData
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.selector
@@ -129,16 +131,21 @@ class BleOperationsActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun log(message: String) {
-        val formattedMessage = String.format("%s: %s", dateFormatter.format(Date()), message)
+        val formattedMessage = String.format(message) // "%s: %s", dateFormatter.format(Date())
         runOnUiThread {
-            val currentLogText = if (log_text_view.text.isEmpty()) {
-                "Beginning of log."
-            } else {
-                log_text_view.text
-            }
-            log_text_view.text = "$currentLogText\n$formattedMessage"
-            log_scroll_view.post { log_scroll_view.fullScroll(View.FOCUS_DOWN) }
+            println(getTemp(formattedMessage))
+            tempData.text = "${getTemp(formattedMessage)}"
+            humiData.text = "${getHumi(formattedMessage)}"// $currentLogText
         }
+    }
+
+    private fun getTemp(wholeText : String) : String
+    {
+        return wholeText.split(",")[0] + "°C"
+    }
+    private fun getHumi(wholeText : String) : String
+    {
+        return wholeText.split(",")[1] + "%"
     }
 
     private fun showCharacteristicOptions(characteristic: BluetoothGattCharacteristic) {
@@ -153,10 +160,10 @@ class BleOperationsActivity : AppCompatActivity() {
                         }
                         CharacteristicProperty.Notifiable, CharacteristicProperty.Indicatable -> {
                             if (notifyingCharacteristics.contains(characteristic.uuid)) {
-                                log("Disabling notifications on ${characteristic.uuid}")
+                            //    log("Disabling notifications on ${characteristic.uuid}")
                                 ConnectionManager.disableNotifications(device, characteristic)
                             } else {
-                                log("Enabling notifications on ${characteristic.uuid}")
+                              //  log("Enabling notifications on ${characteristic.uuid}")
                                 ConnectionManager.enableNotifications(device, characteristic)
                             }
                         }
@@ -204,7 +211,7 @@ class BleOperationsActivity : AppCompatActivity() {
 
             onCharacteristicChanged = { _, characteristic ->
                 println("value" + String(characteristic.value, Charsets.UTF_8))
-                log("Value changed on ${String(characteristic.value, Charsets.UTF_8)}")
+                log("${String(characteristic.value, Charsets.UTF_8)}")
             }
 
         }

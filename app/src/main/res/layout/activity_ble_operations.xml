@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2019 Punch Through Design LLC
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,16 +20,75 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BleOperationsActivity">
+    tools:context=".BleOperationsActivity"
+    >
 
     <LinearLayout
-        android:id="@+id/mtu_container"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/temperatur_container"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="30sp"
+        android:padding="12dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#c5e1b0"
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp"
+            android:padding="12dp"  >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Temperature"
+                android:gravity="left"
+                />
+
+            <TextView
+                android:id="@+id/tempData"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="no data"
+                android:maxLines="1"
+                android:gravity="right">
+
+            </TextView>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/humidity_container"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp"
+            android:padding="12dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Humidity"
+                android:gravity="left"
+                />
+
+            <TextView
+                android:id="@+id/humiData"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="no data"
+                android:maxLines="1"
+                android:gravity="right">
+
+            </TextView>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -43,6 +101,7 @@
         app:layout_constraintStart_toStartOf="parent"
         >
 
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/characteristics_recycler_view"
             android:layout_width="match_parent"
@@ -52,36 +111,6 @@
             android:scrollbars="vertical"
             tools:listitem="@layout/row_characteristic"
             />
-
-        <TextView
-            android:id="@+id/log_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Log"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            />
-
-        <ScrollView
-            android:id="@+id/log_scroll_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="4dp"
-            >
-
-            <TextView
-                android:id="@+id/log_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="bottom"
-                android:scrollbars="vertical"
-                />
-
-        </ScrollView>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
