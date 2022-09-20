@@ -16,6 +16,7 @@
 
 package com.punchthrough.blestarterappandroid.ble
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
@@ -205,6 +206,7 @@ object ConnectionManager {
      * Perform a given [BleOperationType]. All permission checks are performed before an operation
      * can be enqueued by [enqueueOperation].
      */
+    @SuppressLint("MissingPermission")
     @Synchronized
     private fun doNextOperation() {
         if (pendingOperation != null) {
@@ -338,6 +340,7 @@ object ConnectionManager {
     }
 
     private val callback = object : BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             val deviceAddress = gatt.device.address
 

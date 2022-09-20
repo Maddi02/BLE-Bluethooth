@@ -21,9 +21,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.punchthrough.blestarterappandroid.ble.printProperties
-import kotlinx.android.synthetic.main.row_characteristic.view.characteristic_properties
-import kotlinx.android.synthetic.main.row_characteristic.view.characteristic_uuid
+//import kotlinx.android.synthetic.main.row_characteristic.view.characteristic_properties
+//import kotlinx.android.synthetic.main.row_characteristic.view.characteristic_uuid
 import org.jetbrains.anko.layoutInflater
+import java.util.UUID
 
 class CharacteristicAdapter(
     private val items: List<BluetoothGattCharacteristic>,
@@ -42,8 +43,16 @@ class CharacteristicAdapter(
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
-        holder.bind(item)
+        if(items[position].uuid == UUID.fromString("de108da1-e6d1-4cf7-b0a9-36417c10990c"))
+        {
+            val item = items[position]
+            println("postion" + items[position].uuid)
+            holder.bind(item)
+        }
+        else{
+
+        }
+
     }
 
     class ViewHolder(
@@ -52,9 +61,10 @@ class CharacteristicAdapter(
     ) : RecyclerView.ViewHolder(view) {
 
         fun bind(characteristic: BluetoothGattCharacteristic) {
-            view.characteristic_uuid.text = characteristic.uuid.toString()
-            view.characteristic_properties.text = characteristic.printProperties()
-            view.setOnClickListener { onClickListener.invoke(characteristic) }
+//                view.characteristic_uuid.text = characteristic.uuid.toString()
+//                view.characteristic_properties.text = characteristic.printProperties()
+                onClickListener.invoke(characteristic)
+            }
         }
     }
-}
+

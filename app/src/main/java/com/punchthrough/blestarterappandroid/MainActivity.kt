@@ -40,6 +40,7 @@ import com.punchthrough.blestarterappandroid.ble.ConnectionManager
 import kotlinx.android.synthetic.main.activity_main.scan_button
 import kotlinx.android.synthetic.main.activity_main.scan_results_recycler_view
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.appcompatV7.BuildConfig
 import timber.log.Timber
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1

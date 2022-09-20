@@ -22,6 +22,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -35,14 +36,11 @@ import com.punchthrough.blestarterappandroid.ble.ConnectionManager
 import com.punchthrough.blestarterappandroid.ble.isIndicatable
 import com.punchthrough.blestarterappandroid.ble.isNotifiable
 import com.punchthrough.blestarterappandroid.ble.isReadable
-import com.punchthrough.blestarterappandroid.ble.isWritable
 import com.punchthrough.blestarterappandroid.ble.isWritableWithoutResponse
 import com.punchthrough.blestarterappandroid.ble.toHexString
 import kotlinx.android.synthetic.main.activity_ble_operations.characteristics_recycler_view
 import kotlinx.android.synthetic.main.activity_ble_operations.log_scroll_view
 import kotlinx.android.synthetic.main.activity_ble_operations.log_text_view
-import kotlinx.android.synthetic.main.activity_ble_operations.mtu_field
-import kotlinx.android.synthetic.main.activity_ble_operations.request_mtu_button
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.selector
@@ -59,15 +57,13 @@ class BleOperationsActivity : AppCompatActivity() {
     private val characteristics by lazy {
         ConnectionManager.servicesOnDevice(device)?.flatMap { service ->
             service.characteristics ?: listOf()
+
         } ?: listOf()
     }
     private val characteristicProperties by lazy {
         characteristics.map { characteristic ->
             characteristic to mutableListOf<CharacteristicProperty>().apply {
                 if (characteristic.isNotifiable()) add(CharacteristicProperty.Notifiable)
-                if (characteristic.isIndicatable()) add(CharacteristicProperty.Indicatable)
-                if (characteristic.isReadable()) add(CharacteristicProperty.Readable)
-                if (characteristic.isWritable()) add(CharacteristicProperty.Writable)
                 if (characteristic.isWritableWithoutResponse()) {
                     add(CharacteristicProperty.WritableWithoutResponse)
                 }
@@ -93,18 +89,8 @@ class BleOperationsActivity : AppCompatActivity() {
             setDisplayShowTitleEnabled(true)
             title = getString(R.string.ble_playground)
         }
-        setupRecyclerView()
-        request_mtu_button.setOnClickListener {
-            if (mtu_field.text.isNotEmpty() && mtu_field.text.isNotBlank()) {
-                mtu_field.text.toString().toIntOrNull()?.let { mtu ->
-                    log("Requesting for MTU value of $mtu")
-                    ConnectionManager.requestMtu(device, mtu)
-                } ?: log("Invalid MTU value: ${mtu_field.text}")
-            } else {
-                log("Please specify a numeric value for desired ATT MTU (23-517)")
-            }
-            hideKeyboard()
-        }
+       setupRecyclerView()
+
     }
 
     override fun onDestroy() {
@@ -126,6 +112,7 @@ class BleOperationsActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         characteristics_recycler_view.apply {
             adapter = characteristicAdapter
+            println("Here" + characteristics.get(4).uuid)
             layoutManager = LinearLayoutManager(
                 this@BleOperationsActivity,
                 RecyclerView.VERTICAL,
@@ -155,25 +142,25 @@ class BleOperationsActivity : AppCompatActivity() {
     }
 
     private fun showCharacteristicOptions(characteristic: BluetoothGattCharacteristic) {
+        Log.d("MyLog" , characteristic.toString())
         characteristicProperties[characteristic]?.let { properties ->
-            selector("Select an action to perform", properties.map { it.action }) { _, i ->
-                when (properties[i]) {
-                    CharacteristicProperty.Readable -> {
-                        log("Reading from ${characteristic.uuid}")
-                        ConnectionManager.readCharacteristic(device, characteristic)
-                    }
-                    CharacteristicProperty.Writable, CharacteristicProperty.WritableWithoutResponse -> {
-                        showWritePayloadDialog(characteristic)
-                    }
-                    CharacteristicProperty.Notifiable, CharacteristicProperty.Indicatable -> {
-                        if (notifyingCharacteristics.contains(characteristic.uuid)) {
-                            log("Disabling notifications on ${characteristic.uuid}")
-                            ConnectionManager.disableNotifications(device, characteristic)
-                        } else {
-                            log("Enabling notifications on ${characteristic.uuid}")
-                            ConnectionManager.enableNotifications(device, characteristic)
+
+            selector("Connection Successfull!!!!", properties.map { it.action }) { _, i ->
+                Log.d("MyLog", properties[i].action)
+                    when (properties[i]) {
+                        CharacteristicProperty.Writable, CharacteristicProperty.WritableWithoutResponse -> {
+                            // showWritePayloadDialog(characteristic)
                         }
-                    }
+                        CharacteristicProperty.Notifiable, CharacteristicProperty.Indicatable -> {
+                            if (notifyingCharacteristics.contains(characteristic.uuid)) {
+                                log("Disabling notifications on ${characteristic.uuid}")
+                                ConnectionManager.disableNotifications(device, characteristic)
+                            } else {
+                                log("Enabling notifications on ${characteristic.uuid}")
+                                ConnectionManager.enableNotifications(device, characteristic)
+                            }
+                        }
+
                 }
             }
         }
@@ -202,6 +189,8 @@ class BleOperationsActivity : AppCompatActivity() {
     }
 
     private val connectionEventListener by lazy {
+
+
         ConnectionEventListener().apply {
             onDisconnect = {
                 runOnUiThread {
@@ -213,31 +202,11 @@ class BleOperationsActivity : AppCompatActivity() {
                 }
             }
 
-            onCharacteristicRead = { _, characteristic ->
-                log("Read from ${characteristic.uuid}: ${characteristic.value.toHexString()}")
-            }
-
-            onCharacteristicWrite = { _, characteristic ->
-                log("Wrote to ${characteristic.uuid}")
-            }
-
-            onMtuChanged = { _, mtu ->
-                log("MTU updated to $mtu")
-            }
-
             onCharacteristicChanged = { _, characteristic ->
-                log("Value changed on ${characteristic.uuid}: ${characteristic.value.toHexString()}")
+                println("value" + String(characteristic.value, Charsets.UTF_8))
+                log("Value changed on ${String(characteristic.value, Charsets.UTF_8)}")
             }
 
-            onNotificationsEnabled = { _, characteristic ->
-                log("Enabled notifications on ${characteristic.uuid}")
-                notifyingCharacteristics.add(characteristic.uuid)
-            }
-
-            onNotificationsDisabled = { _, characteristic ->
-                log("Disabled notifications on ${characteristic.uuid}")
-                notifyingCharacteristics.remove(characteristic.uuid)
-            }
         }
     }
 
@@ -253,13 +222,14 @@ class BleOperationsActivity : AppCompatActivity() {
                 Readable -> "Read"
                 Writable -> "Write"
                 WritableWithoutResponse -> "Write Without Response"
-                Notifiable -> "Toggle Notifications"
+                Notifiable -> "Get Values"
                 Indicatable -> "Toggle Indications"
             }
     }
 
     private fun Activity.hideKeyboard() {
         hideKeyboard(currentFocus ?: View(this))
+
     }
 
     private fun Context.hideKeyboard(view: View) {
