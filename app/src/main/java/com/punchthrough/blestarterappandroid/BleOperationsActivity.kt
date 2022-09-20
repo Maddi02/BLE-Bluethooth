@@ -22,7 +22,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -33,7 +36,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import code.with.cal.persistenttimerapp.DataHelper
 import com.punchthrough.blestarterappandroid.ble.ConnectionEventListener
 import com.punchthrough.blestarterappandroid.ble.ConnectionManager
 import com.punchthrough.blestarterappandroid.ble.isNotifiable
@@ -45,7 +47,7 @@ import kotlinx.android.synthetic.main.activity_ble_operations.humiData
 import kotlinx.android.synthetic.main.activity_ble_operations.resetButton
 import kotlinx.android.synthetic.main.activity_ble_operations.startButton
 import kotlinx.android.synthetic.main.activity_ble_operations.tempData
-import kotlinx.android.synthetic.main.activity_ble_operations.timeTv
+import kotlinx.android.synthetic.main.activity_ble_operations.timeTV
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.selector
@@ -56,16 +58,21 @@ import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
 import java.util.UUID
+import kotlin.math.roundToInt
 
 var temp : String = ""
 var humi : String = ""
 
 class BleOperationsActivity : AppCompatActivity() {
 
-
-    lateinit var binding : ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
     lateinit var dataHelper: DataHelper
+
     private val timer = Timer()
+
+    private var timerStarted = false
+    private lateinit var serviceIntent: Intent
+    private var time = 0.0
     private  var test : MeasumentScreen = MeasumentScreen()
     private  var measumentScreenCreated : Boolean = false
     private lateinit var device: BluetoothDevice
@@ -96,8 +103,8 @@ class BleOperationsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ConnectionManager.registerListener(connectionEventListener)
-
-
+        dataHelper = DataHelper(applicationContext)
+        binding = ActivityMainBinding.inflate(layoutInflater)
 
 
 
@@ -115,9 +122,28 @@ class BleOperationsActivity : AppCompatActivity() {
        setupRecyclerView()
 
 
+
+
+        startButton.setOnClickListener{ startStopAction() }
+        resetButton.setOnClickListener{ resetAction() }
+
+        if(dataHelper.timerCounting())
+        {
+            startTimer()
+        }
+        else
+        {
+            stopTimer()
+            if(dataHelper.startTime() != null && dataHelper.stopTime() != null)
+            {
+                val time = Date().time - calcRestartTime().time
+                timeTV.text = timeStringFromLong(time)
+            }
+        }
+
+        timer.scheduleAtFixedRate(TimeTask(), 0, 500)
+
     }
-
-
 
 
     override fun onDestroy() {
@@ -290,4 +316,103 @@ class BleOperationsActivity : AppCompatActivity() {
 
     private fun String.hexToBytes() =
         this.chunked(2).map { it.toUpperCase(Locale.US).toInt(16).toByte() }.toByteArray()
+
+
+
+
+    private inner class TimeTask: TimerTask()
+    {
+        override fun run()
+        {
+
+            if(dataHelper.timerCounting())
+            {
+                val time = Date().time - dataHelper.startTime()!!.time
+               timeTV.text = timeStringFromLong(time)
+            }
+        }
+    }
+
+    private fun resetAction()
+    {
+        dataHelper.setStopTime(null)
+        dataHelper.setStartTime(null)
+        stopTimer()
+        timeTV.text = timeStringFromLong(0)
+    }
+
+    private fun stopTimer()
+    {
+        println("in stopTimer")
+        dataHelper.setTimerCounting(false)
+        startButton.text = "Start"
+    }
+
+    private fun startTimer()
+    {
+        println("in startTimer")
+        dataHelper.setTimerCounting(true)
+        startButton.text = "Stop"
+    }
+
+    private fun startStopAction()
+    {
+        println("in startStopAction")
+        if(dataHelper.timerCounting())
+        {
+            dataHelper.setStopTime(Date())
+            stopTimer()
+        }
+        else
+        {
+            if(dataHelper == null)
+            {
+                println("WHHHHHYYYY")
+            }
+            if(dataHelper.stopTime() != null)
+            {
+                dataHelper.setStartTime(calcRestartTime())
+                dataHelper.setStopTime(null)
+            }
+            else
+            {
+                dataHelper.setStartTime(Date())
+            }
+            startTimer()
+        }
+    }
+
+    private fun calcRestartTime(): Date
+    {
+        println("in calcRestartTime")
+        if(dataHelper == null)
+        {
+            println("Datahelper null")
+        }
+        var diff = 0
+        if(dataHelper.startTime() != null && dataHelper.startTime() != null )
+        {
+             diff = (dataHelper.startTime()!!.time - dataHelper.stopTime()!!.time).toInt()
+        }
+
+
+        return Date(System.currentTimeMillis() + diff)
+    }
+
+    private fun timeStringFromLong(ms: Long): String
+    {
+        println("in timeStringFromLong")
+        val seconds = (ms / 1000) % 60
+        val minutes = (ms / (1000 * 60) % 60)
+        val hours = (ms / (1000 * 60 * 60) % 24)
+        return makeTimeString(hours, minutes, seconds)
+    }
+
+    private fun makeTimeString(hours: Long, minutes: Long, seconds: Long): String
+    {
+        println("in makeTimeString")
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+
 }
