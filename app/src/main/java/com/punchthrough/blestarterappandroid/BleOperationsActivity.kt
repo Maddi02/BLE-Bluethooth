@@ -16,11 +16,14 @@
 
 package com.punchthrough.blestarterappandroid
 
+//import kotlinx.android.synthetic.main.activity_ble_operations.log_scroll_view
+//import kotlinx.android.synthetic.main.activity_ble_operations.log_text_view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -33,24 +36,21 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.punchthrough.blestarterappandroid.ble.ConnectionEventListener
 import com.punchthrough.blestarterappandroid.ble.ConnectionManager
-import com.punchthrough.blestarterappandroid.ble.isIndicatable
 import com.punchthrough.blestarterappandroid.ble.isNotifiable
-import com.punchthrough.blestarterappandroid.ble.isReadable
 import com.punchthrough.blestarterappandroid.ble.isWritableWithoutResponse
 import com.punchthrough.blestarterappandroid.ble.toHexString
 import kotlinx.android.synthetic.main.activity_ble_operations.characteristics_recycler_view
 import kotlinx.android.synthetic.main.activity_ble_operations.humiData
-//import kotlinx.android.synthetic.main.activity_ble_operations.log_scroll_view
-//import kotlinx.android.synthetic.main.activity_ble_operations.log_text_view
+import kotlinx.android.synthetic.main.activity_ble_operations.startButton
 import kotlinx.android.synthetic.main.activity_ble_operations.tempData
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.selector
 import org.jetbrains.anko.yesButton
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import java.util.UUID
+
 
 class BleOperationsActivity : AppCompatActivity() {
 
@@ -93,6 +93,11 @@ class BleOperationsActivity : AppCompatActivity() {
         }
        setupRecyclerView()
 
+        startButton.setOnClickListener{
+            println("Button start pressed")
+            val i = Intent(applicationContext, MeasumentScreen::class.java)
+            startActivity(i)
+        }
     }
 
     override fun onDestroy() {
@@ -168,7 +173,8 @@ class BleOperationsActivity : AppCompatActivity() {
                             }
                         }
 
-                }
+                        else -> {}
+                    }
             }
         }
     }
