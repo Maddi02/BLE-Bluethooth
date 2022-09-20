@@ -23,7 +23,6 @@ import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -34,26 +33,41 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import code.with.cal.persistenttimerapp.DataHelper
 import com.punchthrough.blestarterappandroid.ble.ConnectionEventListener
 import com.punchthrough.blestarterappandroid.ble.ConnectionManager
 import com.punchthrough.blestarterappandroid.ble.isNotifiable
 import com.punchthrough.blestarterappandroid.ble.isWritableWithoutResponse
 import com.punchthrough.blestarterappandroid.ble.toHexString
+import com.punchthrough.blestarterappandroid.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_ble_operations.characteristics_recycler_view
 import kotlinx.android.synthetic.main.activity_ble_operations.humiData
+import kotlinx.android.synthetic.main.activity_ble_operations.resetButton
 import kotlinx.android.synthetic.main.activity_ble_operations.startButton
 import kotlinx.android.synthetic.main.activity_ble_operations.tempData
+import kotlinx.android.synthetic.main.activity_ble_operations.timeTv
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.selector
 import org.jetbrains.anko.yesButton
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
+import java.util.Timer
+import java.util.TimerTask
 import java.util.UUID
 
+var temp : String = ""
+var humi : String = ""
 
 class BleOperationsActivity : AppCompatActivity() {
 
+
+    lateinit var binding : ActivityMainBinding
+    lateinit var dataHelper: DataHelper
+    private val timer = Timer()
+    private  var test : MeasumentScreen = MeasumentScreen()
+    private  var measumentScreenCreated : Boolean = false
     private lateinit var device: BluetoothDevice
     private val dateFormatter = SimpleDateFormat("MMM d, HH:mm:ss", Locale.US)
     private val characteristics by lazy {
@@ -80,10 +94,17 @@ class BleOperationsActivity : AppCompatActivity() {
     private var notifyingCharacteristics = mutableListOf<UUID>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ConnectionManager.registerListener(connectionEventListener)
         super.onCreate(savedInstanceState)
+        ConnectionManager.registerListener(connectionEventListener)
+
+
+
+
+
+
         device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
             ?: error("Missing BluetoothDevice from MainActivity!")
+
 
         setContentView(R.layout.activity_ble_operations)
         supportActionBar?.apply {
@@ -93,12 +114,11 @@ class BleOperationsActivity : AppCompatActivity() {
         }
        setupRecyclerView()
 
-        startButton.setOnClickListener{
-            println("Button start pressed")
-            val i = Intent(applicationContext, MeasumentScreen::class.java)
-            startActivity(i)
-        }
+
     }
+
+
+
 
     override fun onDestroy() {
         ConnectionManager.unregisterListener(connectionEventListener)
@@ -113,6 +133,7 @@ class BleOperationsActivity : AppCompatActivity() {
                 return true
             }
         }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -136,22 +157,33 @@ class BleOperationsActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun log(message: String) {
+
         val formattedMessage = String.format(message) // "%s: %s", dateFormatter.format(Date())
         runOnUiThread {
             println(getTemp(formattedMessage))
+       //     MeasumentScreen.temp = getTemp(formattedMessage)
+            temp = getTemp(formattedMessage)
+            humi = getHumi(formattedMessage)
             tempData.text = "${getTemp(formattedMessage)}"
             humiData.text = "${getHumi(formattedMessage)}"// $currentLogText
         }
     }
 
-    private fun getTemp(wholeText : String) : String
-    {
-        return wholeText.split(",")[0] + "°C"
+    companion object{
+
+        fun getTemp(wholeText : String) : String
+        {
+          //  t = wholeText.split(",")[0] + "°C"
+            return wholeText.split(",")[0] + "°C"
+
+        }
+         fun getHumi(wholeText : String) : String
+        {
+            return wholeText.split(",")[1] + "%"
+        }
+
     }
-    private fun getHumi(wholeText : String) : String
-    {
-        return wholeText.split(",")[1] + "%"
-    }
+
 
     private fun showCharacteristicOptions(characteristic: BluetoothGattCharacteristic) {
         Log.d("MyLog" , characteristic.toString())

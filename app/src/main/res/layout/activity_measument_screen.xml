@@ -22,6 +22,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MeasumentScreen"
+    android:id="@+id/measurementScreen"
     >
+
+    <!--text view for displaying heading-->
+    <TextView
+        android:id="@+id/idTVHead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!--        android:textColor="@color/purple_200"-->
+
+    <!--line graph view where we will
+        be displaying our data-->
+    <com.jjoe64.graphview.GraphView
+        android:id="@+id/idGraphView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/idTVHead" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
