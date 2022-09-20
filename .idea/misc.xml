@@ -8,6 +8,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/rectangel.xml" value="0.2" />
         <entry key="app/src/main/res/layout/activity_ble_operations.xml" value="0.21673003802281368" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.42699890136718754" />
         <entry key="app/src/main/res/layout/edittext_hex_payload.xml" value="0.4523773193359375" />

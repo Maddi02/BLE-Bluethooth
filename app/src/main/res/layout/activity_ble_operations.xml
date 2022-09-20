@@ -70,7 +70,9 @@
             android:layout_marginLeft="15sp"
             android:layout_marginRight="15sp"
             android:padding="12dp"
-            >
+            android:layout_marginTop="15sp"
+
+            android:background="#c5e1b0"            >
 
             <TextView
                 android:layout_width="wrap_content"
@@ -101,16 +103,68 @@
         app:layout_constraintStart_toStartOf="parent"
         >
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/rectangel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
 
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="So lets start the measuring"
+                android:gravity="center"
+                android:layout_marginTop="15sp">
+
+            </TextView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bring your device to a place you wanna measure"
+                android:gravity="center"
+                >
+
+            </TextView>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="and go go go"
+                android:gravity="center"
+               >
+
+            </TextView>
+
+           <Button
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_gravity="center_vertical|center_horizontal"
+               android:layout_marginTop="15sp"
+               android:text="Start"
+               >
+
+           </Button>
+
+
+        </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/characteristics_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:scrollbarFadeDuration="0"
             android:scrollbars="vertical"
             tools:listitem="@layout/row_characteristic"
             />
+
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
