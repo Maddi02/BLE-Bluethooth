@@ -23,6 +23,8 @@
     tools:context=".BleOperationsActivity"
     >
 
+
+
     <LinearLayout
         android:id="@+id/temperatur_container"
         android:layout_width="fill_parent"
@@ -160,6 +162,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+
         >
 
         <LinearLayout

@@ -137,7 +137,10 @@ class BleOperationsActivity : AppCompatActivity() {
         showConclusionButton.setOnClickListener{
             val myIntent = Intent(this, MeasumentScreen::class.java)
           //  myIntent.putExtra("key", value) //Optional parameters
-
+            val keyIdentifer: String? = null
+            myIntent.putExtra("keyTempList", tempValue)
+            myIntent.putExtra("keyHumiList", humiValue)
+            myIntent.putExtra("keyTimeList", timeValue)
             startActivity(myIntent)
         }
 

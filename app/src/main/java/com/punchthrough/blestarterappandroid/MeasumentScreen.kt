@@ -21,85 +21,100 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.jjoe64.graphview.GraphView
-import com.jjoe64.graphview.series.DataPoint
-import com.jjoe64.graphview.series.LineGraphSeries
+import androidx.constraintlayout.motion.utils.Easing
+import com.github.mikephil.charting.animation.Easing.EaseInCubic
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import kotlinx.android.synthetic.main.activity_measument_screen.endTimeData
+
+import kotlinx.android.synthetic.main.activity_measument_screen.getTheGraph
+import kotlinx.android.synthetic.main.activity_measument_screen.humidityAvg
+import kotlinx.android.synthetic.main.activity_measument_screen.humidityMax
+import kotlinx.android.synthetic.main.activity_measument_screen.humidityMin
+import kotlinx.android.synthetic.main.activity_measument_screen.startTimeData
+import kotlinx.android.synthetic.main.activity_measument_screen.tempAvgData
+import kotlinx.android.synthetic.main.activity_measument_screen.tempMaxData
+import kotlinx.android.synthetic.main.activity_measument_screen.tempMinData
+import kotlinx.android.synthetic.main.activity_measument_screen.totalTimeData
+import kotlin.math.round
+
 
 import kotlin.properties.Delegates
 
 class MeasumentScreen : AppCompatActivity() {
 
-    lateinit var lineGraphView: GraphView
+
+    private lateinit var tempValueList : ArrayList<Double>
+    private lateinit var humiValueList : ArrayList<Double>
+    private lateinit var timeValueList : ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_measument_screen)
+          tempValueList = (intent.getSerializableExtra("keyTempList") as ArrayList<Double>?)!!
+          humiValueList  = (intent.getSerializableExtra("keyHumiList") as ArrayList<Double>?)!!
+          timeValueList = (intent.getSerializableExtra("keyTimeList") as ArrayList<String>?)!!
 
         // on below line we are initializing
         // our variable with their ids.
-        lineGraphView = findViewById(R.id.idGraphView)
-
-        // on below line we are adding data to our graph view.
-        val series: LineGraphSeries<DataPoint> = LineGraphSeries(
-            arrayOf(
-                // on below line we are adding
-                // each point on our x and y axis.
-                DataPoint(0.0, 100.0),
-                DataPoint(1.0, 3.0),
-                DataPoint(2.0, 4.0),
-                DataPoint(3.0, 9.0),
-                DataPoint(4.0, 6.0),
-                DataPoint(5.0, 3.0),
-                DataPoint(6.0, 6.0),
-                DataPoint(7.0, 1.0),
-                DataPoint(8.0, 2.0)
-            )
-        )
-
-        val series1: LineGraphSeries<DataPoint> = LineGraphSeries(
-            arrayOf(
-                // on below line we are adding
-                // each point on our x and y axis.
-                DataPoint(0.0, 50.0),
-                DataPoint(1.0, 3.0),
-                DataPoint(2.0, 4.0),
-                DataPoint(3.0, 9.0),
-                DataPoint(4.0, 6.0),
-                DataPoint(5.0, 3.0),
-                DataPoint(6.0, 6.0),
-                DataPoint(7.0, 1.0),
-                DataPoint(8.0, 2.0)
-            )
-        )
-
-        // on below line adding animation
-        lineGraphView.animate()
-
-        // on below line we are setting scrollable
-        // for point graph view
-        lineGraphView.viewport.isScrollable = true
-
-        // on below line we are setting scalable.
-        lineGraphView.viewport.isScalable = true
-
-        // on below line we are setting scalable y
-        lineGraphView.viewport.setScalableY(true)
-
-        // on below line we are setting scrollable y
-        lineGraphView.viewport.setScrollableY(true)
-
-        // on below line we are setting color for series.
-        series.color = R.color.colorPrimary
-        series1.color = R.color.colorAccent
-
-        // on below line we are adding
-        // data series to our graph view.
-        lineGraphView.addSeries(series)
-        lineGraphView.addSeries(series1)
+        setLineChartData()
+        setTempConclusion()
+        setHumiConclusion()
+        setTimeConclusion()
     }
 
 
+    private fun setTempConclusion()
+    {
+        tempMinData.text =  tempValueList.toList().min().toString() + "°C"
+        tempMaxData.text =  tempValueList.toList().max().toString() + "°C"
+        tempAvgData.text =  (round(tempValueList.average() * 100) / 100).toString() + "°C"
+    }
+
+    private fun setHumiConclusion()
+    {
+        humidityMin.text =  humiValueList.toList().min().toString() + "%"
+        humidityMax.text =  humiValueList.toList().max().toString() + "%"
+        humidityAvg.text =  (round(humiValueList.average() * 100) / 100).toString() + "%"
+    }
+
+    private fun setTimeConclusion()
+    {
+        totalTimeData.text = timeValueList.size.toString() + " s"
+        startTimeData.text = timeValueList[0]
+        endTimeData.text = timeValueList[timeValueList.size -1]
+    }
+
+
+        private fun setLineChartData() {
+
+            val linevalues = ArrayList<Entry>()
+            val linevalues1 = ArrayList<Entry>()
+            for((secondsCounter, temp) in tempValueList.withIndex())
+            {
+                linevalues.add(Entry( secondsCounter.toFloat(), temp.toFloat()))
+            }
+
+            for((secondsCounter, humi) in humiValueList.withIndex())
+            {
+                linevalues1.add(Entry( secondsCounter.toFloat(), humi.toFloat()))
+            }
 
 
 
-}
+
+
+            getTheGraph.description.text = "x axis in seconds"
+            val linedataset = LineDataSet(linevalues, "Temperatur")
+            val linedataset1 = LineDataSet(linevalues1, "Humidity")
+            //We add features to our chart
+
+
+            //We connect our data to the UI Screen
+            val data = LineData(linedataset, linedataset1)
+            getTheGraph.data = data
+
+
+        }
+    }

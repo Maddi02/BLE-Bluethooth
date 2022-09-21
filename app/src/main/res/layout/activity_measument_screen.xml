@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -23,29 +23,283 @@
     android:layout_height="match_parent"
     tools:context=".MeasumentScreen"
     android:id="@+id/measurementScreen"
+    android:orientation="vertical"
     >
-
-    <!--text view for displaying heading-->
     <TextView
-        android:id="@+id/idTVHead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your conclusion"
+        android:gravity="left"
+        android:textStyle="bold"
+        android:textSize="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <!--text view for displaying heading-->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:gravity="center"
-        android:padding="4dp"
-        android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+         >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total time"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/totalTimeData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+   >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start time"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/startTimeData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End time"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/endTimeData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+    </LinearLayout>
+
+
+    <!--text view for displaying heading-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+        android:layout_marginTop="10sp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temp max"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/tempMaxData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temp min"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/tempMinData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temp avg"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/tempAvgData"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+        android:layout_marginTop="10sp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidity max"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/humidityMax"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidity min"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/humidityMin"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#c5e1b0"
+        android:layout_marginLeft="15sp"
+        android:layout_marginRight="15sp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidity avg"
+            android:gravity="left"
+            />
+
+        <TextView
+            android:id="@+id/humidityAvg"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="no data"
+            android:maxLines="1"
+            android:gravity="right">
+
+        </TextView>
+    </LinearLayout>
+
+
+
+
+
+
+
+
 
     <!--        android:textColor="@color/purple_200"-->
 
     <!--line graph view where we will
         be displaying our data-->
-    <com.jjoe64.graphview.GraphView
-        android:id="@+id/idGraphView"
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/getTheGraph"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/idTVHead" />
+        android:layout_marginTop="52dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
