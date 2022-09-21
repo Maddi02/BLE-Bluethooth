@@ -135,6 +135,7 @@ class BleOperationsActivity : AppCompatActivity() {
         startButton.setOnClickListener{ startStopAction() }
         resetButton.setOnClickListener{ resetAction() }
         showConclusionButton.setOnClickListener{
+
             val myIntent = Intent(this, MeasumentScreen::class.java)
           //  myIntent.putExtra("key", value) //Optional parameters
             val keyIdentifer: String? = null
@@ -142,6 +143,7 @@ class BleOperationsActivity : AppCompatActivity() {
             myIntent.putExtra("keyHumiList", humiValue)
             myIntent.putExtra("keyTimeList", timeValue)
             startActivity(myIntent)
+            resetAction()
         }
 
         if(dataHelper.timerCounting())
