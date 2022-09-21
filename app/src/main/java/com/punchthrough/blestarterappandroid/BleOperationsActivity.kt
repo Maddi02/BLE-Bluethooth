@@ -216,10 +216,10 @@ class BleOperationsActivity : AppCompatActivity() {
 
             }
 
-            tempData.text = "${getTemp(formattedMessage)}"
-            humiData.text = "${getHumi(formattedMessage)}"
-            avergeTempData.text = calculateTempAvg()
-            avergeHumiData.text = calculateHumiAvg()
+            tempData.text = "${getTemp(formattedMessage)}" + "°C"
+            humiData.text = "${getHumi(formattedMessage)}" + "%"
+            avergeTempData.text = calculateTempAvg() + "°C"
+            avergeHumiData.text = calculateHumiAvg() + "%"
         }
     }
 
