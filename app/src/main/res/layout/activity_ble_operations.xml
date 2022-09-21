@@ -82,7 +82,7 @@
                 />
 
             <TextView
-                android:id="@+id/TempDataAverage"
+                android:id="@+id/avergeTempData"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="no data"
@@ -141,7 +141,7 @@
                 />
 
             <TextView
-                android:id="@+id/humiDataAverge"
+                android:id="@+id/avergeHumiData"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="no data"
@@ -239,6 +239,17 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <Button
+                android:id="@+id/showConclusionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show conslusion"
+                android:padding="10dp"
+                android:layout_marginTop="15sp"
+                android:layout_gravity="center_vertical|center_horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         </LinearLayout>

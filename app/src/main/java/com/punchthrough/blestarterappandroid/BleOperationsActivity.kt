@@ -22,10 +22,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattCharacteristic
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -33,6 +31,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -42,9 +41,13 @@ import com.punchthrough.blestarterappandroid.ble.isNotifiable
 import com.punchthrough.blestarterappandroid.ble.isWritableWithoutResponse
 import com.punchthrough.blestarterappandroid.ble.toHexString
 import com.punchthrough.blestarterappandroid.databinding.ActivityMainBinding
+import kotlinx.android.synthetic.main.activity_ble_operations.avergeHumiData
+import kotlinx.android.synthetic.main.activity_ble_operations.avergeTemp
+import kotlinx.android.synthetic.main.activity_ble_operations.avergeTempData
 import kotlinx.android.synthetic.main.activity_ble_operations.characteristics_recycler_view
 import kotlinx.android.synthetic.main.activity_ble_operations.humiData
 import kotlinx.android.synthetic.main.activity_ble_operations.resetButton
+import kotlinx.android.synthetic.main.activity_ble_operations.showConclusionButton
 import kotlinx.android.synthetic.main.activity_ble_operations.startButton
 import kotlinx.android.synthetic.main.activity_ble_operations.tempData
 import kotlinx.android.synthetic.main.activity_ble_operations.timeTV
@@ -58,7 +61,7 @@ import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
 import java.util.UUID
-import kotlin.math.roundToInt
+import kotlin.math.round
 
 var temp : String = ""
 var humi : String = ""
@@ -74,7 +77,10 @@ class BleOperationsActivity : AppCompatActivity() {
     private lateinit var serviceIntent: Intent
     private var time = 0.0
     private  var test : MeasumentScreen = MeasumentScreen()
-    private  var measumentScreenCreated : Boolean = false
+    private  var measurmentStart : Boolean = false
+    private lateinit var tempValue : ArrayList<Double>
+    private lateinit var humiValue : ArrayList<Double>
+    private lateinit var timeValue : ArrayList<String>
     private lateinit var device: BluetoothDevice
     private val dateFormatter = SimpleDateFormat("MMM d, HH:mm:ss", Locale.US)
     private val characteristics by lazy {
@@ -105,7 +111,9 @@ class BleOperationsActivity : AppCompatActivity() {
         ConnectionManager.registerListener(connectionEventListener)
         dataHelper = DataHelper(applicationContext)
         binding = ActivityMainBinding.inflate(layoutInflater)
-
+         tempValue = ArrayList()
+         humiValue = ArrayList()
+         timeValue = ArrayList()
 
 
 
@@ -123,9 +131,15 @@ class BleOperationsActivity : AppCompatActivity() {
 
 
 
-
+        showConclusionButton.isVisible = false
         startButton.setOnClickListener{ startStopAction() }
         resetButton.setOnClickListener{ resetAction() }
+        showConclusionButton.setOnClickListener{
+            val myIntent = Intent(this, MeasumentScreen::class.java)
+          //  myIntent.putExtra("key", value) //Optional parameters
+
+            startActivity(myIntent)
+        }
 
         if(dataHelper.timerCounting())
         {
@@ -184,14 +198,28 @@ class BleOperationsActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun log(message: String) {
 
-        val formattedMessage = String.format(message) // "%s: %s", dateFormatter.format(Date())
+        val formattedMessage = String.format(message)
+        println(dateFormatter.format(Date()))
+
         runOnUiThread {
             println(getTemp(formattedMessage))
        //     MeasumentScreen.temp = getTemp(formattedMessage)
-            temp = getTemp(formattedMessage)
-            humi = getHumi(formattedMessage)
+
+            if(measurmentStart)
+            {
+                println("Measurvalues")
+                timeValue.add(dateFormatter.format(Date()))
+                temp = getTemp(formattedMessage)
+                humi = getHumi(formattedMessage)
+                tempValue.add(temp.toDouble())
+                humiValue.add(humi.toDouble())
+
+            }
+
             tempData.text = "${getTemp(formattedMessage)}"
-            humiData.text = "${getHumi(formattedMessage)}"// $currentLogText
+            humiData.text = "${getHumi(formattedMessage)}"
+            avergeTempData.text = calculateTempAvg()
+            avergeHumiData.text = calculateHumiAvg()
         }
     }
 
@@ -200,15 +228,39 @@ class BleOperationsActivity : AppCompatActivity() {
         fun getTemp(wholeText : String) : String
         {
           //  t = wholeText.split(",")[0] + "°C"
-            return wholeText.split(",")[0] + "°C"
+            return wholeText.split(",")[0]
 
         }
          fun getHumi(wholeText : String) : String
         {
-            return wholeText.split(",")[1] + "%"
+            return wholeText.split(",")[1]
         }
 
     }
+
+    private fun calculateTempAvg() : String
+    {
+        var sum = 0.0
+        for (num in tempValue) {
+            sum += num
+        }
+        val average = sum / tempValue.size
+
+        return  (round(average * 100) / 100).toString()
+    }
+
+
+    private fun calculateHumiAvg() : String
+    {
+        var sum = 0.0
+        for (num in humiValue) {
+            sum += num
+        }
+        val average = sum / humiValue.size
+
+        return  (round(average * 100) / 100).toString()
+    }
+
 
 
     private fun showCharacteristicOptions(characteristic: BluetoothGattCharacteristic) {
@@ -339,13 +391,37 @@ class BleOperationsActivity : AppCompatActivity() {
         dataHelper.setStartTime(null)
         stopTimer()
         timeTV.text = timeStringFromLong(0)
+        tempValue.clear()
+        timeValue.clear()
+        humiValue.clear()
+        startButton.isEnabled = true
+        startButton.isClickable = true
+        showConclusionButton.isVisible = false
     }
 
     private fun stopTimer()
     {
         println("in stopTimer")
         dataHelper.setTimerCounting(false)
+        println("measurment tooks " + timeTV.text)
+        println("measurment starts at" + dataHelper.startTime())
+        println("measurment end at" + dataHelper.stopTime())
         startButton.text = "Start"
+        measurmentStart = false
+
+        for (temp in tempValue) {
+            Log.d("MyLog" , temp.toString())
+        }
+
+        for (time in timeValue) {
+            Log.d("MyLog" , time)
+        }
+
+        Log.d("MyLog", tempValue.size.toString())
+        Log.d("MyLog", timeValue.size.toString())
+        Log.d("MyLog", humiValue.size.toString())
+
+
     }
 
     private fun startTimer()
@@ -353,6 +429,7 @@ class BleOperationsActivity : AppCompatActivity() {
         println("in startTimer")
         dataHelper.setTimerCounting(true)
         startButton.text = "Stop"
+        measurmentStart = true
     }
 
     private fun startStopAction()
@@ -362,21 +439,25 @@ class BleOperationsActivity : AppCompatActivity() {
         {
             dataHelper.setStopTime(Date())
             stopTimer()
+            startButton.isEnabled = false
+            startButton.isClickable = false
+            showConclusionButton.isVisible = true
         }
         else
         {
-            if(dataHelper == null)
-            {
-                println("WHHHHHYYYY")
-            }
             if(dataHelper.stopTime() != null)
             {
                 dataHelper.setStartTime(calcRestartTime())
                 dataHelper.setStopTime(null)
+                Log.d("MyLog" , "Here could be a restart")
+                startButton.isEnabled = false
+                startButton.isClickable = false
+                showConclusionButton.isVisible = true
             }
             else
             {
                 dataHelper.setStartTime(Date())
+
             }
             startTimer()
         }
